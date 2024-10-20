@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -14,7 +15,6 @@ import (
 )
 
 type MessageCapsule struct {
-	IdToken string `json:"idToken"`
 	Message string `json:"message"`
 	Unlock  string `json:"unlock"`
 }
@@ -27,7 +27,9 @@ func PostMessage(c *gin.Context, client firestore.Client, authClient auth.Client
 		return
 	}
 
-	authToken, err := authClient.VerifyIDToken(context.Background(), message.IdToken)
+	fmt.Println(c.Request.Header)
+
+	authToken, err := authClient.VerifyIDToken(context.Background(), c.Request.Header["Token"][0])
 	if err != nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
@@ -43,6 +45,29 @@ func PostMessage(c *gin.Context, client firestore.Client, authClient auth.Client
 	})
 	if postErr != nil {
 		log.Fatalf("Failed adding message: %v", err)
+	}
+
+}
+
+func GetMessageSummaries(c *gin.Context, client firestore.Client, authClient auth.Client, ctx context.Context) {
+
+	authToken, err := authClient.VerifyIDToken(context.Background(), c.Request.Header["Token"][0])
+	if err != nil {
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+
+	uid := authToken.UID
+
+	query := client.Collection("messages").Where("user", "==", uid)
+
+	docs, err := query.Documents(ctx).GetAll()
+	if err != nil {
+		log.Fatalf("Failed to retrieve documents: %v", err)
+	}
+
+	for _, doc := range docs {
+		fmt.Printf("Document ID: %s\nData: %v\n", doc.Ref.ID, doc.Data())
 	}
 
 }
@@ -80,6 +105,25 @@ func main() {
 	router.Use(AuthMiddleware(*authClient))
 	router.Use(FirestoreMiddleware(*client))
 	router.Use(CtxMiddleware(ctx))
+
+	router.GET("/messages", func(c *gin.Context) {
+		authClient, ok := c.MustGet("authConn").(auth.Client)
+		if !ok {
+			//handle error
+		}
+
+		firestoreClient, ok := c.MustGet("firestoreConn").(firestore.Client)
+		if !ok {
+			//handle error
+		}
+
+		ctx, ok := c.MustGet("ctx").(context.Context)
+		if !ok {
+			//handle error
+		}
+
+		GetMessageSummaries(c, firestoreClient, authClient, ctx)
+	})
 
 	router.POST("/create", func(c *gin.Context) {
 
