@@ -4,19 +4,18 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
 	"firebase.google.com/go/auth"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 )
 
 func main() {
 
 	// Env File Stuff
-	envFile, _ := godotenv.Read(".env")
-	projectID := envFile["project"]
+	projectID := os.Getenv("PROJECT_ID")
 
 	// Setting up Firestore database
 	ctx := context.Background()
