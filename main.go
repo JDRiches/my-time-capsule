@@ -144,6 +144,6 @@ func main() {
 		GetCapsuleDetail(c, firestoreClient, authClient, ctx)
 	})
 
-	router.Run("localhost:8080")
+	router.Run()
 
 }
