@@ -2,13 +2,10 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 
-	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go"
-	"firebase.google.com/go/auth"
 	"github.com/gin-gonic/gin"
 )
 
@@ -41,106 +38,24 @@ func main() {
 	// Gin API stuff
 	router := gin.Default()
 
-	router.Use(AuthMiddleware(*authClient))
-	router.Use(FirestoreMiddleware(*client))
-	router.Use(CtxMiddleware(ctx))
-
 	router.GET("/messages", func(c *gin.Context) {
-		authClient, ok := c.MustGet("authConn").(auth.Client)
-		if !ok {
-			fmt.Println(ok)
-		}
-
-		firestoreClient, ok := c.MustGet("firestoreConn").(firestore.Client)
-		if !ok {
-			fmt.Println(ok)
-		}
-
-		ctx, ok := c.MustGet("ctx").(context.Context)
-		if !ok {
-			fmt.Println(ok)
-		}
-
-		GetCapsules(c, firestoreClient, authClient, ctx)
+		GetCapsules(c, *client, *authClient)
 	})
 
 	router.POST("/create", func(c *gin.Context) {
-
-		authClient, ok := c.MustGet("authConn").(auth.Client)
-		if !ok {
-			fmt.Println(ok)
-		}
-
-		firestoreClient, ok := c.MustGet("firestoreConn").(firestore.Client)
-		if !ok {
-			fmt.Println(ok)
-		}
-
-		ctx, ok := c.MustGet("ctx").(context.Context)
-		if !ok {
-			fmt.Println(ok)
-		}
-
-		PostCapsule(c, firestoreClient, authClient, ctx)
+		PostCapsule(c, *client, *authClient)
 	})
 
 	router.POST("/delete", func(c *gin.Context) {
-		authClient, ok := c.MustGet("authConn").(auth.Client)
-		if !ok {
-			fmt.Println(ok)
-		}
-
-		firestoreClient, ok := c.MustGet("firestoreConn").(firestore.Client)
-		if !ok {
-			fmt.Println(ok)
-		}
-
-		ctx, ok := c.MustGet("ctx").(context.Context)
-		if !ok {
-			fmt.Println(ok)
-		}
-
-		DeleteCapsule(c, firestoreClient, authClient, ctx)
+		DeleteCapsule(c, *client, *authClient)
 	})
 
 	router.POST("/open", func(c *gin.Context) {
-
-		authClient, ok := c.MustGet("authConn").(auth.Client)
-		if !ok {
-			fmt.Println(ok)
-		}
-
-		firestoreClient, ok := c.MustGet("firestoreConn").(firestore.Client)
-		if !ok {
-			fmt.Println(ok)
-		}
-
-		ctx, ok := c.MustGet("ctx").(context.Context)
-		if !ok {
-			fmt.Println(ok)
-		}
-
-		OpenCapsule(c, firestoreClient, authClient, ctx)
+		OpenCapsule(c, *client, *authClient)
 	})
 
 	router.GET("/detail", func(c *gin.Context) {
-
-		authClient, ok := c.MustGet("authConn").(auth.Client)
-		if !ok {
-			fmt.Println(ok)
-		}
-
-		firestoreClient, ok := c.MustGet("firestoreConn").(firestore.Client)
-		if !ok {
-			fmt.Println(ok)
-		}
-
-		ctx, ok := c.MustGet("ctx").(context.Context)
-		if !ok {
-			fmt.Println(ok)
-		}
-
-		GetCapsuleDetail(c, firestoreClient, authClient, ctx)
+		GetCapsuleDetail(c, *client, *authClient)
 	})
 
 	router.Run()

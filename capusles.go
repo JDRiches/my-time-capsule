@@ -24,7 +24,9 @@ type Capsule struct {
 	Unlocked    bool      `json:"unlocked", firestore:"unlocked"`
 }
 
-func PostCapsule(c *gin.Context, client firestore.Client, authClient auth.Client, ctx context.Context) {
+func PostCapsule(c *gin.Context, client firestore.Client, authClient auth.Client) {
+
+	ctx := context.Background()
 
 	var message PostMessageCapsule
 
@@ -64,7 +66,9 @@ func PostCapsule(c *gin.Context, client firestore.Client, authClient auth.Client
 	c.JSON(http.StatusOK, capsule)
 }
 
-func GetCapsules(c *gin.Context, client firestore.Client, authClient auth.Client, ctx context.Context) {
+func GetCapsules(c *gin.Context, client firestore.Client, authClient auth.Client) {
+
+	ctx := context.Background()
 
 	uid, err := GetRequestUID(c.Request.Header["Token"][0], authClient)
 	if err != nil {
@@ -98,8 +102,10 @@ func GetCapsules(c *gin.Context, client firestore.Client, authClient auth.Client
 
 }
 
-func GetCapsuleDetail(c *gin.Context, client firestore.Client, authClient auth.Client, ctx context.Context) {
+func GetCapsuleDetail(c *gin.Context, client firestore.Client, authClient auth.Client) {
 	// Get the details of a capsule. Will only work if the capsule is opened
+
+	ctx := context.Background()
 
 	// Get User who sent request
 	uid, err := GetRequestUID(c.Request.Header["Token"][0], authClient)
@@ -134,8 +140,10 @@ func GetCapsuleDetail(c *gin.Context, client firestore.Client, authClient auth.C
 
 }
 
-func DeleteCapsule(c *gin.Context, client firestore.Client, authClient auth.Client, ctx context.Context) {
+func DeleteCapsule(c *gin.Context, client firestore.Client, authClient auth.Client) {
 	//Attempt to delete a capsule
+
+	ctx := context.Background()
 
 	// Get User who sent request
 	uid, err := GetRequestUID(c.Request.Header["Token"][0], authClient)
@@ -172,9 +180,11 @@ func DeleteCapsule(c *gin.Context, client firestore.Client, authClient auth.Clie
 
 }
 
-func OpenCapsule(c *gin.Context, client firestore.Client, authClient auth.Client, ctx context.Context) {
+func OpenCapsule(c *gin.Context, client firestore.Client, authClient auth.Client) {
 	//Attempt to open a message capulse
 	//Requires a message ID
+
+	ctx := context.Background()
 
 	// Get User who sent request
 	uid, err := GetRequestUID(c.Request.Header["Token"][0], authClient)
