@@ -70,13 +70,12 @@ func PostCapsule(c *gin.Context, client firestore.Client, authClient auth.Client
 
 func GetCapsules(c *gin.Context, client firestore.Client, authClient auth.Client, ctx context.Context) {
 
-	authToken, err := authClient.VerifyIDToken(context.Background(), c.Request.Header["Token"][0])
+	uid, err := GetRequestUID(c.Request.Header["Token"][0], authClient)
 	if err != nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	uid := authToken.UID
 	query := client.Collection("messages").Where("user", "==", uid)
 
 	docs, err := query.Documents(ctx).GetAll()
@@ -107,13 +106,12 @@ func GetCapsuleDetail(c *gin.Context, client firestore.Client, authClient auth.C
 	// Get the details of a capsule. Will only work if the capsule is opened
 
 	// Get User who sent request
-	authToken, err := authClient.VerifyIDToken(context.Background(), c.Request.Header["Token"][0])
+	uid, err := GetRequestUID(c.Request.Header["Token"][0], authClient)
 	if err != nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	uid := authToken.UID
 	capulseID := c.Query("id")
 
 	query := client.Collection("messages").Doc(capulseID)
@@ -144,13 +142,12 @@ func DeleteCapsule(c *gin.Context, client firestore.Client, authClient auth.Clie
 	//Attempt to delete a capsule
 
 	// Get User who sent request
-	authToken, err := authClient.VerifyIDToken(context.Background(), c.Request.Header["Token"][0])
+	uid, err := GetRequestUID(c.Request.Header["Token"][0], authClient)
 	if err != nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	uid := authToken.UID
 	capulseID := c.Query("id")
 
 	query := client.Collection("messages").Doc(capulseID)
@@ -184,13 +181,12 @@ func OpenCapsule(c *gin.Context, client firestore.Client, authClient auth.Client
 	//Requires a message ID
 
 	// Get User who sent request
-	authToken, err := authClient.VerifyIDToken(context.Background(), c.Request.Header["Token"][0])
+	uid, err := GetRequestUID(c.Request.Header["Token"][0], authClient)
 	if err != nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
 
-	uid := authToken.UID
 	capulseID := c.Query("id")
 
 	query := client.Collection("messages").Doc(capulseID)
