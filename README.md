@@ -19,3 +19,7 @@ Authentication is provided by Firebase. A Firebase Authentication provider needs
 # Running the API
 
 To run the API simply use `go run .`
+
+OR
+
+Build the Docker image and create a container. The API will be listening on port `8080`
