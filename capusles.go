@@ -24,10 +24,6 @@ type Capsule struct {
 	Unlocked    bool      `json:"unlocked", firestore:"unlocked"`
 }
 
-// Struct for capsules that have been unlocked
-type CapsuleDetail struct {
-}
-
 func PostCapsule(c *gin.Context, client firestore.Client, authClient auth.Client, ctx context.Context) {
 
 	var message PostMessageCapsule
@@ -204,7 +200,7 @@ func OpenCapsule(c *gin.Context, client firestore.Client, authClient auth.Client
 		return
 	}
 	if capsule["unlocked"].(bool) {
-		c.JSON(http.StatusOK, gin.H{"message": "capsule already opened"})
+		c.JSON(http.StatusBadRequest, gin.H{"message": "capsule already opened"})
 		return
 	}
 
@@ -221,7 +217,7 @@ func OpenCapsule(c *gin.Context, client firestore.Client, authClient auth.Client
 			log.Printf("An error has occurred: %s", err)
 		}
 	} else {
-		c.JSON(http.StatusUnauthorized, gin.H{"message": "Too soon"})
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "too early to open capsule"})
 		return
 	}
 
