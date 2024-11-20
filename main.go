@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"log"
+	"my-time-capsule/handler"
 	"os"
 
 	firebase "firebase.google.com/go"
@@ -11,7 +12,7 @@ import (
 
 func main() {
 
-	// Env File Stuff
+	// Load Environment Variables
 	projectID := os.Getenv("PROJECT_ID")
 
 	// Setting up Firestore database
@@ -22,40 +23,40 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	//Set up auth
-
+	// Set up authentication with Firebase
 	authClient, err := app.Auth(context.Background())
 	if err != nil {
 		panic(err)
 	}
 
+	// Set up client for Firestore database access
 	client, err := app.Firestore(ctx)
 	if err != nil {
 		log.Fatalln(err)
 	}
 	defer client.Close()
 
-	// Gin API stuff
+	// Set up Gin Router
 	router := gin.Default()
 
 	router.GET("/messages", func(c *gin.Context) {
-		GetCapsules(c, *client, *authClient)
+		handler.GetCapsules(c, *client, *authClient)
 	})
 
 	router.POST("/create", func(c *gin.Context) {
-		PostCapsule(c, *client, *authClient)
+		handler.PostCapsule(c, *client, *authClient)
 	})
 
 	router.POST("/delete", func(c *gin.Context) {
-		DeleteCapsule(c, *client, *authClient)
+		handler.DeleteCapsule(c, *client, *authClient)
 	})
 
 	router.POST("/open", func(c *gin.Context) {
-		OpenCapsule(c, *client, *authClient)
+		handler.OpenCapsule(c, *client, *authClient)
 	})
 
 	router.GET("/detail", func(c *gin.Context) {
-		GetCapsuleDetail(c, *client, *authClient)
+		handler.GetCapsuleDetail(c, *client, *authClient)
 	})
 
 	router.Run()

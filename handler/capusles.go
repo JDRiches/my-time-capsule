@@ -1,4 +1,4 @@
-package main
+package handler
 
 import (
 	"context"
@@ -12,11 +12,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Struct for post message requests
 type PostMessageCapsule struct {
 	Message    string `json:"message"`
 	UnlockDate string `json:"unlock_date"`
 }
 
+// Str
 type Capsule struct {
 	Id          string    `json:"id", firestore:"-"`
 	CreatedDate time.Time `json:"created", firestore:"created"`
@@ -24,12 +26,12 @@ type Capsule struct {
 	Unlocked    bool      `json:"unlocked", firestore:"unlocked"`
 }
 
+// Handler function to create a capsule
 func PostCapsule(c *gin.Context, client firestore.Client, authClient auth.Client) {
 
 	ctx := context.Background()
 
 	var message PostMessageCapsule
-
 	if err := c.BindJSON(&message); err != nil {
 		return
 	}
@@ -47,7 +49,7 @@ func PostCapsule(c *gin.Context, client firestore.Client, authClient auth.Client
 		log.Fatalf("Failed adding message: %v", err)
 	}
 
-	//Map reprenting the capsule to be posted
+	//Map representing the capsule to be posted
 	capsule := map[string]interface{}{
 		"user":        authToken.UID,
 		"message":     message.Message,
@@ -66,6 +68,8 @@ func PostCapsule(c *gin.Context, client firestore.Client, authClient auth.Client
 	c.JSON(http.StatusOK, capsule)
 }
 
+// Handler function to return all capsules owned by the requestor
+// Does not show the message of the capsule
 func GetCapsules(c *gin.Context, client firestore.Client, authClient auth.Client) {
 
 	ctx := context.Background()
@@ -102,8 +106,9 @@ func GetCapsules(c *gin.Context, client firestore.Client, authClient auth.Client
 
 }
 
+// Handler function to show all details of the capsule
+// Will only return a succesfull response if the capsule is opened
 func GetCapsuleDetail(c *gin.Context, client firestore.Client, authClient auth.Client) {
-	// Get the details of a capsule. Will only work if the capsule is opened
 
 	ctx := context.Background()
 
@@ -140,8 +145,8 @@ func GetCapsuleDetail(c *gin.Context, client firestore.Client, authClient auth.C
 
 }
 
+// Handler function to delete a capsule given an ID
 func DeleteCapsule(c *gin.Context, client firestore.Client, authClient auth.Client) {
-	//Attempt to delete a capsule
 
 	ctx := context.Background()
 
@@ -180,9 +185,9 @@ func DeleteCapsule(c *gin.Context, client firestore.Client, authClient auth.Clie
 
 }
 
+// Handler function to open a capsule
+// Will only succeed if the opening time if before the current time.
 func OpenCapsule(c *gin.Context, client firestore.Client, authClient auth.Client) {
-	//Attempt to open a message capulse
-	//Requires a message ID
 
 	ctx := context.Background()
 
